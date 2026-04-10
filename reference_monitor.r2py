@@ -52,23 +52,27 @@ class ABFile():
   def close(self):
     #if b file valid overwrite a
     b_data = self.Bfile.readat(None, 0)
-
-
-    self.Bfile.close()
-
     b_size = len(b_data)
 
 
-    if b_size >= 2 and b_data[0] == 'S' and b_data[b_size-1] == 'E':
-
+    if b_size >= 2 and b_data[0] == 'S' and b_data[-1] == 'E':
+     
+      self.Afile.close()
       removefile(self.Afn)
-      update_file = openfile(self.Afn, True)
-      update_file.writeat(b_data, 0)
-      update_file.close()
+      self.Afile = openfile(self.Afn, True)
+      self.Afile.writeat(b_data, 0)
+      self.Bfile = openfile(self.Bfn, True)
+      self.Bfile.writeat(b_data, 0)
+
+    else:
+      self.Bfile.close()
+      removefile(self.Bfn)
+      self.Bfile_new = openfile(self.Bfn, True)
+      self.Bfile_new.writeat(b_data, 0)
+      self.Bfile_new.close()
     
-    else
-     self.Afile.close()
-     self.Bfile.close()
+    self.Afile.close()
+    self.Bfile.close()
 
 
 def ABopenfile(filename, create):
