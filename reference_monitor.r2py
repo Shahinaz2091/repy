@@ -41,15 +41,6 @@ class ABFile():
 
   def writeat(self,data,offset):
     # Write the requested data to the B file using the sandbox's writeat call
-
-    b_data = self.Bfile.readat(None, 0)
-    b_size = len(b_data)
-    
-    if offset > b_size:
-        padding = '\x00' * (offset - b_size)
-        self.Bfile.writeat(padding, b_size)
-
-    # Now write the actual data
     self.Bfile.writeat(data,offset)
 
 
