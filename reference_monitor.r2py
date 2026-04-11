@@ -30,6 +30,7 @@ class ABFile():
       self.Afile = openfile(self.Afn,create)
       self.Bfile = openfile(self.Bfn,create)
       self.Afile.writeat('SE',0)
+      self.Bfile.writeat('SE',0)
 #open the two files a and b, if we had to create the file we make it valid 
     else:
         self.Afile=openfile(self.Afn, False)
