@@ -34,6 +34,7 @@ class ABFile():
         self.Afile = openfile(self.Afn, False)
       if self.Bfn not in listfiles():
         self.Bfile = openfile(self.Bfn, True)
+        self.Bfile.writeat('SE', 0)
       else:
         self.Bfile = openfile(self.Bfn, False)
 
