@@ -65,16 +65,15 @@ class ABFile():
 
     if len(b_data) >= 2 and b_data[0] == 'S' and b_data[-1] == 'E':
         #overwrite A file
-      self.Afile.close()
       removefile(self.Afn)
       self.Afile = openfile(self.Afn, True)
       self.Afile.writeat(b_data, 0)
 
         #overwrite B file 
-    self.Bfile.close()
-    removefile(self.Bfn)
-    self.Bfile = openfile(self.Bfn, True)
-    self.Bfile.writeat(b_data, 0)
+    
+    #removefile(self.Bfn)
+    #self.Bfile = openfile(self.Bfn, True)
+    #self.Bfile.writeat(b_data, 0)
     self.Afile.close()
     self.Bfile.close()
 
