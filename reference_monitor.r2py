@@ -65,7 +65,8 @@ class ABFile():
     b_data = self.Bfile.readat(None, 0)
 
 
-    if len(b_data) >= 2 and b_data[0].upper == 'S' and b_data[-1].upper == 'E':
+
+    if len(b_data) >= 2 and (b_data[0] == 'S' or b_data[0] == 's') and (b_data[-1] == 'E' or b_data[-1] == 'e'):
         #overwrite A file
       self.Afile.close()
       removefile(self.Afn)
