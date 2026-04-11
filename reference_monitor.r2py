@@ -31,6 +31,7 @@ class ABFile():
       self.Bfile = openfile(self.Bfn,create)
       self.Afile.writeat('SE',0)
       self.Bfile.writeat('SE',0)
+
 #open the two files a and b, if we had to create the file we make it valid 
     else:
         self.Afile=openfile(self.Afn, False)
@@ -64,18 +65,14 @@ class ABFile():
     b_data = self.Bfile.readat(None, 0)
 
 
-    if len(b_data) >= 2 and b_data[0] == 'S' and b_data[-1] == 'E':
+    if len(b_data) >= 2 and b_data[0].upper == 'S' and b_data[-1].upper == 'E':
         #overwrite A file
       self.Afile.close()
       removefile(self.Afn)
       self.Afile = openfile(self.Afn, True)
       self.Afile.writeat(b_data, 0)
 
-        #overwrite B file 
-    self.Bfile.close()
-    removefile(self.Bfn)
-    self.Bfile = openfile(self.Bfn, True)
-    self.Bfile.writeat(b_data, 0)
+
     self.Afile.close()
     self.Bfile.close()
 
