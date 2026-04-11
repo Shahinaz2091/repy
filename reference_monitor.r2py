@@ -52,7 +52,7 @@ class ABFile():
         self.Bfile.writeat(padding, b_size)
 
     # Now write the actual data
-    if b_data[0]!= " ":
+    if data[0]!= " ":
         self.Bfile.writeat(data,offset)
 
 
