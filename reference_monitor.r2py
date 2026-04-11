@@ -43,51 +43,42 @@ class ABFile():
         self.Afile=openfile(self.Afn, False)
         self.Bfile=openfile(self.Bfn, False)
 
- # self.Afile.filelock = createlock()
-# self.Bfile.filelock = createlock()
+    self.filelock = createlock()
 
 
   def writeat(self,data,offset):
-    # Write the requested data to the B file using the sandbox's writeat call
-    self.filelock = createlock()
-    self.lock.acquire(True)
-
+    self.filelock.acquire(True)
     b_data = self.Bfile.readat(None, 0)
     b_size = len(b_data)
-    
-    if offset > b_size:
-        
-        padding = '\x00' * (offset - b_size)
-        self.Bfile.writeat(padding, b_size)
-        self.lock.release()
 
-    # Now write the actual data
-    if data[0]!= " ":
-        self.Bfile.writeat(data,offset)
-        self.lock.release()
+    if offset > b_size:
+      padding = '\x00' * (offset - b_size)
+      self.Bfile.writeat(padding, b_size)
+
+    if data[0] != ' ':
+      self.Bfile.writeat(data, offset)
+    self.filelock.release()
 
 
   def readat(self,bytes,offset):
-    # Read from the A file using the sandbox's readat...
-    #don't do anything 
-    return self.Afile.readat(bytes,offset)
+    self.filelock.acquire(True)
+    result = self.Afile.readat(bytes, offset)
+    self.filelock.release()
+    return result
 
   def close(self):
-    #if b file valid overwrite a
+    self.filelock.acquire(True)
     b_data = self.Bfile.readat(None, 0)
 
-
-
     if len(b_data) >= 2 and b_data[0] == 'S' and b_data[-1] == 'E':
-        #overwrite A file
       self.Afile.close()
       removefile(self.Afn)
       self.Afile = openfile(self.Afn, True)
       self.Afile.writeat(b_data, 0)
 
-
     self.Afile.close()
     self.Bfile.close()
+    self.filelock.release()
 
 
 def ABopenfile(filename, create):
