@@ -27,9 +27,10 @@ class ABFile():
 
     # make the files and add 'SE' to the readat file...
     if create:
-
-      removefile(self.Afn)
-      removefile(self.Bfn)
+      if self.Afn in listfiles():
+        removefile(self.Afn)
+      if self.Bfn in listfiles():
+        removefile(self.Bfn)
       self.Afile = openfile(self.Afn, True)
       self.Bfile = openfile(self.Bfn, True)
       self.Afile.writeat('SE', 0)
