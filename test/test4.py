@@ -1,0 +1,27 @@
+# ATTACK 4: Null byte injection via large offset write
+# The padding logic in writeat fills gaps with null bytes '\x00'
+# Writing 'E' at a large offset creates: 'SE' + '\x00'*N + 'E'
+# This passes the validity check (starts 'S', ends 'E') but corrupts A with null bytes
+
+if "testfile.txt.a" in listfiles():
+  removefile("testfile.txt.a")
+if "testfile.txt.b" in listfiles():
+  removefile("testfile.txt.b")
+
+myfile = ABopenfile("testfile.txt", True)
+
+# Write 'E' far out — monitor pads with null bytes, file becomes 'SE\x00\x00...E'
+# B[0]='S', B[-1]='E' so it passes the validity check in close()
+myfile.writeat("E", 100)
+myfile.close()
+
+# Reopen and read — A file now contains null bytes injected by attacker
+myfile = ABopenfile("testfile.txt", False)
+data = myfile.readat(None, 0)
+myfile.close()
+
+if '\x00' in data:
+  log("Attack succeeded: null bytes injected into A file via padding exploit!\n")
+  log("Corrupted data: " + repr(data) + "\n")
+else:
+  log("Attack failed.\n")

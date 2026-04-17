@@ -1,0 +1,41 @@
+# ATTACK 5: Threading race condition
+# No lock protecting writeat — two threads can write simultaneously
+# Thread 1 writes valid data, Thread 2 overwrites mid-operation
+# Goal: cause B to contain invalid data that bypasses the validity check in close()
+
+if "testfile.txt.a" in listfiles():
+  removefile("testfile.txt.a")
+if "testfile.txt.b" in listfiles():
+  removefile("testfile.txt.b")
+
+myfile = ABopenfile("testfile.txt", True)
+
+def thread_write_valid():
+  # Writes valid data starting with S and ending with E
+  myfile.writeat("StestE", 0)
+
+def thread_write_invalid():
+  # Overwrites just the last char to break validity
+  # Races with thread_write_valid to corrupt B after it's written
+  myfile.writeat("SX", 0)
+
+# Launch both threads simultaneously
+createthread(thread_write_valid)
+createthread(thread_write_invalid)
+
+# Give threads time to run
+sleep(1)
+
+myfile.close()
+
+# Reopen and check what ended up in A
+myfile = ABopenfile("testfile.txt", False)
+data = myfile.readat(None, 0)
+myfile.close()
+
+log("File contents after race: " + data + "\n")
+
+if data != "StestE" and data != "SE":
+  log("Attack succeeded: race condition caused unexpected data in A file!\n")
+else:
+  log("Attack did not corrupt file this run (try again — race is non-deterministic).\n")
