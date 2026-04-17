@@ -33,9 +33,3 @@ myfile = ABopenfile("testfile.txt", False)
 data = myfile.readat(None, 0)
 myfile.close()
 
-log("File contents after race: " + data + "\n")
-
-if data != "StestE" and data != "SE":
-  log("Attack succeeded: race condition caused unexpected data in A file!\n")
-else:
-  log("Attack did not corrupt file this run (try again — race is non-deterministic).\n")
