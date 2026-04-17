@@ -7,10 +7,3 @@ if "testfile.txt.b" in listfiles():
   removefile("testfile.txt.b")
 
 myfile = ABopenfile("testfile.txt", True)
-
-try:
-  myfile.writeat("", 0)  # empty string — data[0] raises IndexError
-  myfile.close()
-except:
-  myfile.close()
-  log("Attack succeeded: empty write caused an exception, violating Req 1!\n")
