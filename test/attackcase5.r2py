@@ -1,0 +1,10 @@
+if "testfile.txt.a" in listfiles():
+ removefile("testfile.txt.a")
+if "testfile.txt.b" in listfiles():
+ removefile("testfile.txt.b")
+myfile = ABopenfile('testfile.txt',True)
+try:
+  myfile.writeat('S123E',1000)
+  myfile.close()
+except:
+  myfile.close()
