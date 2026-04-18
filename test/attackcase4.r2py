@@ -3,18 +3,17 @@ if "testfile.txt.a" in listfiles():
 if "testfile.txt.b" in listfiles():
   removefile("testfile.txt.b")
 
-myfile = ABopenfile("testfile.txt", True)
+def threadone():
+  myfile=ABopenfile("testfile.txt", True)
+  if myfile.readat(2,0) == "SE":
+      myfile.writeat("Stest1E",0)
+      sleep(3)
+      myfile.close()
+def threadtwo():
+    if "testfile.txt.a" in listfiles():
+      removefile("testfile.txt.a")
+    if "testfile.txt.b" in listfiles():
+      removefile("testfile.txt.b")
 
-# Step 1: write valid data to B
-myfile.writeat("StestE", 0)
-
-myfile.writeat(" bad", 100)
-
-
-myfile.writeat("E", 99)
-
-myfile.close()
-
-myfile = ABopenfile("testfile.txt", False)
-data = myfile.readat(None, 0)
-myfile.close()
+createthread(threadone)
+createthread(threadtwo)
