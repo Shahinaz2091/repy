@@ -7,7 +7,7 @@ myfile = ABopenfile("testfile.txt", True)
 
 myfile.writeat("SE", 0)
 
-myfile.writeat("X", 50)
+myfile.writeat("X", 100000)
 
 myfile.close()
 
