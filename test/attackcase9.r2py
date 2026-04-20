@@ -13,7 +13,7 @@ def writeat1():
 
 def writeat2():
     myfile3=ABopenfile("test2.txt",True)
-    myfile3.writeat('Shelooop1E',0)
+    myfile3.writeat('Shelooop2E',0)
     myfile3.close()
 
 createthread(writeat1)
