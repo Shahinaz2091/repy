@@ -1,0 +1,20 @@
+if "testfile.txt.a" in listfiles():
+  removefile("testfile.txt.a")
+if "testfile.txt.b" in listfiles():
+  removefile("testfile.txt.b")
+
+def writeat1():
+    myfile1=ABopenfile("test.txt",True)
+    myfile1.writeat('ShelooopE',0)
+    myfile1.close()
+    myfile2=ABopenfile("test1.txt",True)
+    myfile2.writeat('Shelooop1E',0)
+    myfile2.close()
+
+def writeat2():
+    myfile3=ABopenfile("test2.txt",True)
+    myfile3.writeat('Shelooop1E',0)
+    myfile3.close()
+
+createthread(writeat1)
+createthread(writeat2) 
