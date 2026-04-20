@@ -12,7 +12,7 @@ def writeat1():
     myfile2.close()
 
 def writeat2():
-    myfile3=ABopenfile("test2.txt",True)
+    myfile3=ABopenfile("test1.txt",True)
     myfile3.writeat('Shelooop2E',0)
     myfile3.close()
 
