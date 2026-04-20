@@ -1,0 +1,16 @@
+if "testfile.txt.a" in listfiles():
+  removefile("testfile.txt.a")
+if "testfile.txt.b" in listfiles():
+  removefile("testfile.txt.b")
+
+myfile = ABopenfile("testfile.txt", True)
+
+myfile.writeat("StestE", 0)
+
+myfile.writeat("XXX", 6)
+
+myfile.close()
+
+myfile = ABopenfile("testfile.txt", False)
+data = myfile.readat(None, 0)
+myfile.close()
