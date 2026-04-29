@@ -1,9 +1,3 @@
-# Attack 12: File-length exploit via staged offset writes
-# The monitor's validity check only inspects B[0]=='S' and B[-1]=='E'.
-# Strategy: make 3-4 invalid writes at increasing offsets (building garbage in B),
-# interleave readat calls (which still return clean A data), then patch just the
-# first and last byte so close() sees a "valid" file and commits garbage to A.
-
 if "testfile.txt.a" in listfiles():
   removefile("testfile.txt.a")
 if "testfile.txt.b" in listfiles():
@@ -11,32 +5,23 @@ if "testfile.txt.b" in listfiles():
 
 myfile = ABopenfile("testfile.txt", True)
 
-# Write 1 - invalid: B = "AAAAA" (no S/E framing)
-myfile.writeat("AAAAA", 0)
+myfile.writeat("invalid1", 0)
 
-# readat still returns clean A ("SE") while B is dirty
 myfile.readat(None, 0)
 
-# Write 2 - invalid: B = "AAAAABBBBB"
-myfile.writeat("BBBBB", 5)
+myfile.writeat("invalid2", 8)
 
-# Write 3 - invalid: B = "AAAAABBBBBCCCCC"
-myfile.writeat("CCCCC", 10)
+myfile.writeat("invalid3", 16)
 
-# readat again -- A unchanged
 myfile.readat(None, 0)
 
-# Write 4 - invalid: B = "AAAAABBBBBCCCCCDDDDDD"
-myfile.writeat("DDDDDD", 15)
+myfile.writeat("invalid4", 24)
 
-# Now patch endpoints only so validity check passes
-myfile.writeat("S", 0)   # B[0] = 'S'
-myfile.writeat("E", 20)  # B[-1] = 'E'
+myfile.writeat("S", 0)
+myfile.writeat("E", 31)
 
-# close() sees B starts with 'S' and ends with 'E', commits garbage to A
 myfile.close()
 
-# Reopen and confirm A now holds the corrupted content
 myfile = ABopenfile("testfile.txt", False)
 myfile.readat(None, 0)
 myfile.close()

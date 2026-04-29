@@ -1,27 +1,24 @@
-# Attack 11: Threading on same object breaks the reference monitor
-# Two threads share the same ABFile instance. thread_closer() calls close(),
-# which closes the underlying file handles and then releases the global lock.
-# thread_writer() then acquires the lock and calls self.Bfile.readat() on an
-# already-closed handle, raising an unhandled exception that produces output --
-# breaking the monitor's requirement to stay silent.
-
 if "testfile.txt.a" in listfiles():
   removefile("testfile.txt.a")
 if "testfile.txt.b" in listfiles():
   removefile("testfile.txt.b")
 
 myfile = ABopenfile("testfile.txt", True)
-myfile.writeat("StestE", 0)
 
-def thread_writer():
+def thread_write_s():
   for i in range(100):
-    myfile.writeat("StestE", 0)
-    sleep(0.01)
+    myfile.writeat("S", 0)
 
-def thread_closer():
-  sleep(0.05)
-  myfile.close()
+def thread_write_garbage():
+  for i in range(100):
+    myfile.writeat("corruptE", 1)
 
-createthread(thread_writer)
-createthread(thread_closer)
-sleep(3)
+createthread(thread_write_s)
+createthread(thread_write_garbage)
+sleep(2)
+
+myfile.close()
+
+myfile = ABopenfile("testfile.txt", False)
+data = myfile.readat(None, 0)
+myfile.close()
