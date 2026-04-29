@@ -16,6 +16,7 @@ EXCP="exceptions"
 TARGET="target"
 FUNC="func"
 OBJC="objc"
+mycontext['filelock'] = createlock()
 
 class ABFile():
   def __init__(self,filename,create):
@@ -81,7 +82,6 @@ class ABFile():
 
 
 def ABopenfile(filename, create):
-  mycontext['filelock'] = createlock()
   return ABFile(filename,create)
 
 
