@@ -6,9 +6,9 @@ This security layer inadequately handles A/B storage for files in RepyV2.
 Note:
     This security layer uses encasementlib.r2py, restrictions.default, repy.py and Python
     Also you need to give it an application to run.
-    python repy.py restrictions.default encasementlib.r2py [security_layer].r2py [attack_program].r2py 
-    
-    """ 
+    python repy.py restrictions.default encasementlib.r2py [security_layer].r2py [attack_program].r2py
+
+    """
 TYPE="type"
 ARGS="args"
 RETURN="return"
@@ -17,16 +17,14 @@ TARGET="target"
 FUNC="func"
 OBJC="objc"
 
+mycontext['filelock'] = createlock()
+
 class ABFile():
   def __init__(self,filename,create):
-    # globals
     mycontext['debug'] = False
-    self.filelock = createlock()
-    # local (per object) reference to the underlying file
     self.Afn = filename+'.a'
     self.Bfn = filename+'.b'
 
-    # make the files and add 'SE' to the readat file...
     if create:
       if self.Afn not in listfiles():
         self.Afile = openfile(self.Afn, True)
@@ -35,41 +33,37 @@ class ABFile():
         self.Afile = openfile(self.Afn, False)
       if self.Bfn not in listfiles():
         self.Bfile = openfile(self.Bfn, True)
-        self.Bfile.writeat('SE', 0)
       else:
         self.Bfile = openfile(self.Bfn, False)
 
-#open the two files a and b, if we had to create the file we make it valid
     else:
-        self.Afile=openfile(self.Afn, False)
-        self.Bfile=openfile(self.Bfn, False)
+      self.Afile = openfile(self.Afn, False)
+      self.Bfile = openfile(self.Bfn, False)
 
 
-  def writeat(self,data,offset):
-    self.filelock.acquire(True)
-    b_data = self.Bfile.readat(None, 0)
-    b_size = len(b_data)
-
-    if offset > b_size:
-      padding = '\x00' * (offset - b_size)
-      self.Bfile.writeat(padding, b_size)
-
-    if data[0] != ' ':
+  def writeat(self, data, offset):
+    mycontext['filelock'].acquire(True)
+    if len(data) > 0 and data[0] != ' ':
       self.Bfile.writeat(data, offset)
-    self.filelock.release()
+    mycontext['filelock'].release()
 
 
-  def readat(self,bytes,offset):
-    self.filelock.acquire(True)
+  def readat(self, bytes, offset):
+    mycontext['filelock'].acquire(True)
     result = self.Afile.readat(bytes, offset)
-    self.filelock.release()
+    mycontext['filelock'].release()
     return result
 
+
   def close(self):
-    self.filelock.acquire(True)
+    mycontext['filelock'].acquire(True)
+    a_data = self.Afile.readat(None, 0)
     b_data = self.Bfile.readat(None, 0)
 
-    if len(b_data) >= 2 and b_data[0] == 'S' and b_data[-1] == 'E':
+    a_valid = len(a_data) >= 2 and a_data[0] == 'S' and a_data[-1] == 'E'
+    b_valid = len(b_data) >= 2 and b_data[0] == 'S' and b_data[-1] == 'E'
+
+    if a_valid and b_valid:
       self.Afile.close()
       removefile(self.Afn)
       self.Afile = openfile(self.Afn, True)
@@ -77,12 +71,12 @@ class ABFile():
 
     self.Afile.close()
     self.Bfile.close()
-    self.filelock.release()
+    mycontext['filelock'].release()
 
 
 def ABopenfile(filename, create):
   mycontext['count'] = mycontext.get('count', 0) + 1
-  return ABFile(filename,create)
+  return ABFile(filename, create)
 
 
 
