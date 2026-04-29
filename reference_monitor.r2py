@@ -17,12 +17,11 @@ TARGET="target"
 FUNC="func"
 OBJC="objc"
 
-mycontext['filelock'] = createlock()
-
 class ABFile():
   def __init__(self,filename,create):
     # globals
-    mycontext['debug'] = False   
+    mycontext['debug'] = False
+    self.filelock = createlock()
     # local (per object) reference to the underlying file
     self.Afn = filename+'.a'
     self.Bfn = filename+'.b'
@@ -40,15 +39,14 @@ class ABFile():
       else:
         self.Bfile = openfile(self.Bfn, False)
 
-#open the two files a and b, if we had to create the file we make it valid 
+#open the two files a and b, if we had to create the file we make it valid
     else:
         self.Afile=openfile(self.Afn, False)
         self.Bfile=openfile(self.Bfn, False)
 
 
-
   def writeat(self,data,offset):
-    mycontext['filelock'].acquire(True)
+    self.filelock.acquire(True)
     b_data = self.Bfile.readat(None, 0)
     b_size = len(b_data)
 
@@ -58,17 +56,17 @@ class ABFile():
 
     if data[0] != ' ':
       self.Bfile.writeat(data, offset)
-    mycontext['filelock'].release()
+    self.filelock.release()
 
 
   def readat(self,bytes,offset):
-    mycontext['filelock'].acquire(True)
+    self.filelock.acquire(True)
     result = self.Afile.readat(bytes, offset)
-    mycontext['filelock'].release()
+    self.filelock.release()
     return result
 
   def close(self):
-    mycontext['filelock'].acquire(True)
+    self.filelock.acquire(True)
     b_data = self.Bfile.readat(None, 0)
 
     if len(b_data) >= 2 and b_data[0] == 'S' and b_data[-1] == 'E':
@@ -79,10 +77,11 @@ class ABFile():
 
     self.Afile.close()
     self.Bfile.close()
-    mycontext['filelock'].release()
+    self.filelock.release()
 
 
 def ABopenfile(filename, create):
+  mycontext['count'] = mycontext.get('count', 0) + 1
   return ABFile(filename,create)
 
 
