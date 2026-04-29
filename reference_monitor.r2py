@@ -43,11 +43,10 @@ class ABFile():
         self.Afile=openfile(self.Afn, False)
         self.Bfile=openfile(self.Bfn, False)
 
-    self.filelock = createlock()
 
 
   def writeat(self,data,offset):
-    self.filelock.acquire(True)
+    mycontext['filelock'].acquire(True)
     b_data = self.Bfile.readat(None, 0)
     b_size = len(b_data)
 
@@ -57,17 +56,17 @@ class ABFile():
 
     if data[0] != ' ':
       self.Bfile.writeat(data, offset)
-    self.filelock.release()
+    mycontext['filelock'].release()
 
 
   def readat(self,bytes,offset):
-    self.filelock.acquire(True)
+    mycontext['filelock'].acquire(True)
     result = self.Afile.readat(bytes, offset)
-    self.filelock.release()
+    mycontext['filelock'].release()
     return result
 
   def close(self):
-    self.filelock.acquire(True)
+    mycontext['filelock'].acquire(True)
     b_data = self.Bfile.readat(None, 0)
 
     if len(b_data) >= 2 and b_data[0] == 'S' and b_data[-1] == 'E':
@@ -78,10 +77,11 @@ class ABFile():
 
     self.Afile.close()
     self.Bfile.close()
-    self.filelock.release()
+    mycontext['filelock'].release()
 
 
 def ABopenfile(filename, create):
+  mycontext['filelock'] = createlock()
   return ABFile(filename,create)
 
 
