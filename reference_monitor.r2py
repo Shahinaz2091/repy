@@ -80,7 +80,6 @@ class ABFile():
 
 
 def ABopenfile(filename, create):
-  mycontext['count'] = mycontext.get('count', 0) + 1
   return ABFile(filename, create)
 
 
