@@ -25,12 +25,12 @@ class ABFile():
     self.Afn = filename+'.a'
     self.Bfn = filename+'.b'
 
-    mycontext['filelock'].acquire(True)
     if create:
-      if self.Afn in listfiles():
-        removefile(self.Afn)
-      self.Afile = openfile(self.Afn, True)
-      self.Afile.writeat('SE', 0)
+      if self.Afn not in listfiles():
+        self.Afile = openfile(self.Afn, True)
+        self.Afile.writeat('SE', 0)
+      else:
+        self.Afile = openfile(self.Afn, False)
 
       if self.Bfn in listfiles():
         removefile(self.Bfn)
@@ -39,10 +39,9 @@ class ABFile():
     else:
       self.Afile = openfile(self.Afn, False)
       self.Bfile = openfile(self.Bfn, False)
-    mycontext['filelock'].release()
 
 
-  def writeat(self, data, offset):
+  def writeat(self,data,offset):
     mycontext['filelock'].acquire(True)
     if len(data) > 0 and data[0] != ' ':
       b_data = self.Bfile.readat(None, 0)
@@ -53,7 +52,7 @@ class ABFile():
     mycontext['filelock'].release()
 
 
-  def readat(self, bytes, offset):
+  def readat(self,bytes,offset):
     mycontext['filelock'].acquire(True)
     result = self.Afile.readat(bytes, offset)
     mycontext['filelock'].release()
@@ -62,13 +61,11 @@ class ABFile():
 
   def close(self):
     mycontext['filelock'].acquire(True)
-    a_data = self.Afile.readat(None, 0)
     b_data = self.Bfile.readat(None, 0)
 
-    a_valid = len(a_data) >= 2 and a_data[0] == 'S' and a_data[-1] == 'E'
     b_valid = len(b_data) >= 2 and b_data[0] == 'S' and b_data[-1] == 'E'
 
-    if a_valid and b_valid:
+    if b_valid:
       self.Afile.close()
       removefile(self.Afn)
       self.Afile = openfile(self.Afn, True)
@@ -80,7 +77,7 @@ class ABFile():
 
 
 def ABopenfile(filename, create):
-  return ABFile(filename, create)
+  return ABFile(filename,create)
 
 
 
