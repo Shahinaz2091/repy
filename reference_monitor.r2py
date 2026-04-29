@@ -44,6 +44,10 @@ class ABFile():
   def writeat(self, data, offset):
     mycontext['filelock'].acquire(True)
     if len(data) > 0 and data[0] != ' ':
+      b_data = self.Bfile.readat(None, 0)
+      b_size = len(b_data)
+      if offset > b_size:
+        self.Bfile.writeat('\x00' * (offset - b_size), b_size)
       self.Bfile.writeat(data, offset)
     mycontext['filelock'].release()
 
