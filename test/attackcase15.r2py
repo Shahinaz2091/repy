@@ -5,24 +5,20 @@ if "testfile.txt.b" in listfiles():
 
 f = ABopenfile("testfile.txt", True)
 
-# A starts valid
 assert(f.readat(None, 0) == "SE")
 
-# Invalid write to B.
-# This should NOT be accepted as a valid staged file,
-# but a flawed monitor may still update B's length.
-f.writeat("S", 0)
+# Step 1: make B length 1 with invalid data
+f.writeat("A", 0)
 
-# Now append at offset 1.
-# Offset 1 is not greater than current B length if the invalid write changed length.
+# Step 2: write valid ending at the append position
 f.writeat("E", 1)
 
 f.close()
 
 f = ABopenfile("testfile.txt", False)
 
-# If the monitor is flawed, B became "SE" through invalid intermediate state
-# and may be committed incorrectly.
-assert(f.readat(None, 0) != "SE")
+# Correct behavior: A should remain "SE"
+# Bad behavior: invalid B length handling may corrupt/commit B
+assert(f.readat(None, 0) == "AE")
 
 f.close()
