@@ -5,18 +5,20 @@ if "testfile.txt.b" in listfiles():
 
 f = ABopenfile("testfile.txt", True)
 
-# Existing valid content is "SE", length 2
 assert(f.readat(None, 0) == "SE")
 
-# Offset is NOT greater than length.
-# This is exactly the append position.
-f.writeat("X", 2)
+# Step 1: make B length 1 with invalid data
+f.writeat("A", 0)
+
+# Step 2: write valid ending at the append position
+f.writeat("E", 1)
 
 f.close()
 
 f = ABopenfile("testfile.txt", False)
 
-# The correct monitor should not let this become "SEX"
-assert(f.readat(None, 0) == "SE")
+# Correct behavior: A should remain "SE"
+# Bad behavior: invalid B length handling may corrupt/commit B
+assert(f.readat(None, 0) == "AE")
 
 f.close()
