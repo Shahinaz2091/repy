@@ -1,0 +1,29 @@
+if "testfile.txt.a" in listfiles():
+  removefile("testfile.txt.a")
+if "testfile.txt.b" in listfiles():
+  removefile("testfile.txt.b")
+
+f = ABopenfile("testfile.txt", True)
+
+assert(f.readat(None, 0) == "SE")
+
+# Invalid write: starts with S but does not end with E.
+# A flawed monitor may write it to B, then raise/reject after.
+try:
+  f.writeat("S", 0)
+except:
+  pass
+
+# Now offset 1 is exactly the append position if B length became 1.
+# It is NOT greater than the data length.
+f.writeat("E", 1)
+
+f.close()
+
+f = ABopenfile("testfile.txt", False)
+
+# Vulnerable monitor may commit the B file as "SE"
+# even though it was built through an invalid intermediate write.
+assert(f.readat(None, 0) == "SE")
+
+f.close()
