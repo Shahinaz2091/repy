@@ -5,24 +5,24 @@ if "testfile.txt.b" in listfiles():
 
 f = ABopenfile("testfile.txt", True)
 
+# Initial A file should be valid
 assert(f.readat(None, 0) == "SE")
 
-# Valid B, length 4
-f.writeat("S12E", 0)
+# B is empty, so offset 0 is legal
+f.writeat("S", 0)
 
-# Invalid overwrite at index 3, still inside length
-try:
-  f.writeat("X", 3)
-except:
-  pass
+# B length is now 1.
+# Offset 1 is NOT past EOF; it is exactly the append position.
+f.writeat("123", 1)
 
-# Append at exactly length 4, not greater
+# B length is now 4.
+# Offset 4 is exactly the append position.
 f.writeat("E", 4)
 
 f.close()
 
 f = ABopenfile("testfile.txt", False)
 
-assert(f.readat(None, 0) == "S12EE")
+assert(f.readat(None, 0) == "S123E")
 
 f.close()
