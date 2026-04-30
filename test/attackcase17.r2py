@@ -5,19 +5,27 @@ if "testfile.txt.b" in listfiles():
 
 f = ABopenfile("testfile.txt", True)
 
+# A file starts valid
 assert(f.readat(None, 0) == "SE")
 
-try:
-  f.writeat("S123", 0)
-except:
-  pass
+# Build B using legal append positions only.
+# After this write, B length should be 1.
+f.writeat("S", 0)
 
+# Offset 1 is exactly the append position.
+# After this write, B length should be 4.
+f.writeat("123", 1)
+
+# Offset 4 is exactly the append position.
+# After this write, B should be valid: S123E
 f.writeat("E", 4)
 
 f.close()
 
 f = ABopenfile("testfile.txt", False)
 
+# If the monitor mishandles file length / append positions,
+# this will expose it.
 assert(f.readat(None, 0) == "S123E")
 
 f.close()
