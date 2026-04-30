@@ -5,20 +5,29 @@ if "testfile.txt.b" in listfiles():
 
 myfile = ABopenfile("testfile.txt", True)
 
-myfile.writeat("invalid1", 0)
+# Write 1 - invalid, offset 0 <= len("SE")=2, overwrites within bounds
+# B = "AA" (len=2)
+myfile.writeat("AA", 0)
 
 myfile.readat(None, 0)
 
-myfile.writeat("invalid2", 8)
+# Write 2 - invalid, offset 2 == len("AA")=2, the exact append position
+# B = "AABB" (len=4)
+myfile.writeat("BB", 2)
 
-myfile.writeat("invalid3", 16)
+# Write 3 - invalid, offset 4 == len("AABB")=4, append again
+# B = "AABBCC" (len=6)
+myfile.writeat("CC", 4)
 
 myfile.readat(None, 0)
 
-myfile.writeat("invalid4", 24)
+# Write 4 - invalid, offset 6 == len("AABBCC")=6, append again
+# B = "AABBCCDD" (len=8)
+myfile.writeat("DD", 6)
 
+# Patch endpoints to make B appear valid
 myfile.writeat("S", 0)
-myfile.writeat("E", 31)
+myfile.writeat("E", 7)
 
 myfile.close()
 

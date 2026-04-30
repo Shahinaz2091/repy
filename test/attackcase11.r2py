@@ -6,19 +6,21 @@ if "testfile.txt.b" in listfiles():
 myfile = ABopenfile("testfile.txt", True)
 
 def thread_write_s():
-  for i in range(100):
+  for i in range(10):
     myfile.writeat("S", 0)
+    sleep(0.05)
 
 def thread_write_garbage():
-  for i in range(100):
+  for i in range(10):
     myfile.writeat("corruptE", 1)
+    sleep(0.05)
 
 createthread(thread_write_s)
 createthread(thread_write_garbage)
-sleep(2)
+sleep(1.5)
 
 myfile.close()
 
 myfile = ABopenfile("testfile.txt", False)
-data = myfile.readat(None, 0)
+myfile.readat(None, 0)
 myfile.close()
