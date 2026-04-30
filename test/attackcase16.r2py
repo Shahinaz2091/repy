@@ -1,0 +1,22 @@
+if "testfile.txt.a" in listfiles():
+  removefile("testfile.txt.a")
+if "testfile.txt.b" in listfiles():
+  removefile("testfile.txt.b")
+
+f = ABopenfile("testfile.txt", True)
+
+# Existing valid content is "SE", length 2
+assert(f.readat(None, 0) == "SE")
+
+# Offset is NOT greater than length.
+# This is exactly the append position.
+f.writeat("X", 2)
+
+f.close()
+
+f = ABopenfile("testfile.txt", False)
+
+# The correct monitor should not let this become "SEX"
+assert(f.readat(None, 0) == "SE")
+
+f.close()
