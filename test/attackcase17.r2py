@@ -3,26 +3,33 @@ if "testfile.txt.a" in listfiles():
 if "testfile.txt.b" in listfiles():
   removefile("testfile.txt.b")
 
+# Create AB file
 f = ABopenfile("testfile.txt", True)
 
-# Initial A file should be valid
+# A starts as valid SE
 assert(f.readat(None, 0) == "SE")
 
-# B is empty, so offset 0 is legal
-f.writeat("S", 0)
+# Write invalid data to B.
+# It starts with S but does not end with E.
+f.writeat("SHOW", 0)
 
-# B length is now 1.
-# Offset 1 is NOT past EOF; it is exactly the append position.
-f.writeat("123", 1)
-
-# B length is now 4.
-# Offset 4 is exactly the append position.
-f.writeat("E", 4)
-
+# Close. Correct monitor should NOT commit SHOW to A.
 f.close()
 
+# Reopen same file
 f = ABopenfile("testfile.txt", False)
 
-assert(f.readat(None, 0) == "S123E")
+# Append at the end of existing B data.
+# len("SHOW") == 4, so offset 4 is legal append position.
+f.writeat("ME", 4)
+
+# Now B becomes SHOWME, which starts with S and ends with E.
+f.close()
+
+# Reopen and check A
+f = ABopenfile("testfile.txt", False)
+
+# Vulnerable monitor incorrectly commits SHOWME to A.
+assert(f.readat(None, 0) == "SHOWME")
 
 f.close()
