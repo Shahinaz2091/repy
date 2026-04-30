@@ -5,15 +5,32 @@ if "testfile.txt.b" in listfiles():
 
 f = ABopenfile("testfile.txt", True)
 
+# Initial A content
 assert(f.readat(None, 0) == "SE")
 
-f.writeat("S", 0)
-f.writeat("E", 1)
+# Create a valid B file of length 5
+f.writeat("S123E", 0)
+
+# Invalid overwrite INSIDE the existing B file.
+# Offset 4 is within the current length, not past EOF.
+# This changes the ending E to X, making B invalid.
+try:
+  f.writeat("X", 4)
+except:
+  pass
+
+# Now append at the real current length: 5.
+# Offset 5 is allowed because length is 5.
+# A flawed monitor may have its internal length tracking thrown off
+# by the rejected invalid overwrite.
+f.writeat("E", 5)
 
 f.close()
 
 f = ABopenfile("testfile.txt", False)
 
-assert(f.readat(None, 0) == "SE")
+# Secure behavior should keep/commit the valid staged file as S123EE.
+# A length-bug monitor may fail to commit correctly.
+assert(f.readat(None, 0) == "S123EE")
 
 f.close()
