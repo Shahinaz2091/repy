@@ -5,19 +5,17 @@ if "testfile.txt.b" in listfiles():
 
 myfile = ABopenfile("testfile.txt", True)
 
-def thread_write_s():
-  for i in range(10):
-    myfile.writeat("S", 0)
-    sleep(0.05)
+def thread_write_valid():
+  for i in range(200):
+    myfile.writeat("StestE", 0)
 
-def thread_write_garbage():
-  for i in range(10):
-    myfile.writeat("corruptE", 1)
-    sleep(0.05)
+def thread_write_corrupt():
+  for i in range(200):
+    myfile.writeat("SX", 0)
 
-createthread(thread_write_s)
-createthread(thread_write_garbage)
-sleep(1.5)
+createthread(thread_write_valid)
+createthread(thread_write_corrupt)
+sleep(1)
 
 myfile.close()
 

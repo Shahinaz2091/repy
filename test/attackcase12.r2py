@@ -5,29 +5,26 @@ if "testfile.txt.b" in listfiles():
 
 myfile = ABopenfile("testfile.txt", True)
 
-# Write 1 - invalid, offset 0 <= len("SE")=2, overwrites within bounds
-# B = "AA" (len=2)
-myfile.writeat("AA", 0)
+# Write 1 - invalid: long data at offset 0 (offset 0 <= len("SE")=2)
+# grows B from 2 bytes to 10 bytes; no S/E framing
+myfile.writeat("aaaaaaaaaa", 0)
 
 myfile.readat(None, 0)
 
-# Write 2 - invalid, offset 2 == len("AA")=2, the exact append position
-# B = "AABB" (len=4)
-myfile.writeat("BB", 2)
+# Write 2 - invalid: append at offset == len(B) == 10
+myfile.writeat("bbbbbbbbbb", 10)
 
-# Write 3 - invalid, offset 4 == len("AABB")=4, append again
-# B = "AABBCC" (len=6)
-myfile.writeat("CC", 4)
+# Write 3 - invalid: append at offset == len(B) == 20
+myfile.writeat("cccccccccc", 20)
 
 myfile.readat(None, 0)
 
-# Write 4 - invalid, offset 6 == len("AABBCC")=6, append again
-# B = "AABBCCDD" (len=8)
-myfile.writeat("DD", 6)
+# Write 4 - invalid: append at offset == len(B) == 30
+myfile.writeat("dddddddddd", 30)
 
 # Patch endpoints to make B appear valid
 myfile.writeat("S", 0)
-myfile.writeat("E", 7)
+myfile.writeat("E", 39)
 
 myfile.close()
 
