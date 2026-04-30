@@ -1,0 +1,25 @@
+# Clean old files
+if "testfile.txt.a" in listfiles():
+  removefile("testfile.txt.a")
+if "testfile.txt.b" in listfiles():
+  removefile("testfile.txt.b")
+
+myfile = ABopenfile("testfile.txt", True)
+
+# Valid base content length = 2
+assert(myfile.readat(None, 0) == "SE")
+
+# Write exactly at offset 2, which should be allowed as append
+# because "SE" has indexes 0 and 1, and index 2 is the next position.
+myfile.writeat("BAD", 2)
+
+myfile.close()
+
+# Reopen and check whether invalid append was accepted
+myfile = ABopenfile("testfile.txt", False)
+
+# If the defense is correct, A should still be only "SE"
+# If the monitor mishandles append logic, it may allow "SEBAD"
+assert(myfile.readat(None, 0) == "SE")
+
+myfile.close()
