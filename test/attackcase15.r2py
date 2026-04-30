@@ -1,0 +1,26 @@
+if "testfile.txt.a" in listfiles():
+  removefile("testfile.txt.a")
+if "testfile.txt.b" in listfiles():
+  removefile("testfile.txt.b")
+
+f = ABopenfile("testfile.txt", True)
+
+# Initial valid A-file content should be SE
+assert(f.readat(None, 0) == "SE")
+
+# Invalid staged write to B: starts with S but does not end with E
+# A flawed monitor may still update B's length to 4
+f.writeat("S123", 0)
+
+# Now write exactly at offset 4, which is the append position
+# if the invalid write incorrectly changed B's length
+f.writeat("E", 4)
+
+f.close()
+
+f = ABopenfile("testfile.txt", False)
+
+# If the monitor has the file-length bug, it may commit S123E
+assert(f.readat(None, 0) == "S123E")
+
+f.close()
