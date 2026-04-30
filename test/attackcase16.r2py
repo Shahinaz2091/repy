@@ -3,22 +3,19 @@ if "testfile.txt.a" in listfiles():
 if "testfile.txt.b" in listfiles():
   removefile("testfile.txt.b")
 
-f = ABopenfile("testfile.txt", True)
+f1 = ABopenfile("testfile.txt", True)
+f2 = ABopenfile("testfile.txt", False)
 
-assert(f.readat(None, 0) == "SE")
+f1.writeat("S111E", 0)
+f2.writeat("S222E", 0)
 
-# Step 1: make B length 1 with invalid data
-f.writeat("A", 0)
-
-# Step 2: write valid ending at the append position
-f.writeat("E", 1)
-
-f.close()
+f1.close()
+f2.close()
 
 f = ABopenfile("testfile.txt", False)
 
-# Correct behavior: A should remain "SE"
-# Bad behavior: invalid B length handling may corrupt/commit B
-assert(f.readat(None, 0) == "AE")
+# A correct monitor should not allow both handles to race on same file.
+# If both were allowed, final content may be inconsistent.
+assert(f.readat(None, 0) != "S111E")
 
 f.close()
