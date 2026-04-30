@@ -1,0 +1,23 @@
+if "testfile.txt.a" in listfiles():
+  removefile("testfile.txt.a")
+if "testfile.txt.b" in listfiles():
+  removefile("testfile.txt.b")
+
+# Step 1: Write 'SHOW' — invalid (no trailing E), Bfile holds invalid data
+myfile = ABopenfile("testfile.txt", True)
+myfile.writeat("SHOW", 0)
+myfile.close()
+
+# Step 2: Reopen, append 'ME' at offset == len('SHOW') == 4 (valid append position)
+# A broken monitor using offset >= len(B) blocks this, raising an exception
+myfile = ABopenfile("testfile.txt", True)
+myfile.writeat("ME", 4)
+myfile.close()
+
+# Step 3: Afile should now have 'SHOWME' (starts S, ends E — committed on close)
+myfile = ABopenfile("testfile.txt", False)
+data = myfile.readat(None, 0)
+myfile.close()
+
+if data != "SHOWME":
+  log("ERROR: expected Afile to contain 'SHOWME' but got: " + str(data) + "\n")
